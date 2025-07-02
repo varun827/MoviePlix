@@ -10,8 +10,6 @@
   <header>
     <img src="logo.png" alt="MoviePlix Logo" class="site-logo" />
   </header>
-  
-  
 
   <div class="search-container">
     <input type="text" id="movieInput" placeholder="Search a movie..." />
@@ -21,10 +19,23 @@
   <h2>⭐ Top Rated Movies</h2>
   <div class="movie-grid" id="topRatedMovies"></div>
 
-  <div id="movieInfo"></div>
-
   <script>
     const tmdbApiKey = 'fdf93abc60745ca57ef10f0cc2533025';
+
+    // Step 1: Manual map of provider names to real OTT URLs
+    const providerLinkMap = {
+      "Netflix": "https://www.netflix.com/",
+      "Amazon Prime Video": "https://www.primevideo.com/",
+      "Disney Plus Hotstar": "https://www.hotstar.com/",
+      "JioCinema": "https://www.jiocinema.com/",
+      "ZEE5": "https://www.zee5.com/",
+      "Sony Liv": "https://www.sonyliv.com/",
+      "Hulu": "https://www.hulu.com/",
+      "Apple TV Plus": "https://tv.apple.com/",
+      "YouTube": "https://www.youtube.com/",
+      "Google Play Movies": "https://play.google.com/store/movies",
+      "HBO Max": "https://www.max.com/"
+    };
 
     async function searchMovies() {
       const query = document.getElementById('movieInput').value.trim();
@@ -48,9 +59,8 @@
 
         const card = document.createElement('div');
         card.className = 'movie-card';
-        card.style = "background:#1a1a1a;padding:10px;width:160px;border-radius:10px;cursor:pointer;";
         card.innerHTML = `
-          <img src="${poster}" alt="${movie.title}" style="width:100%;border-radius:10px;" />
+          <img src="${poster}" alt="${movie.title}" />
           <p>${movie.title}</p>
         `;
         card.onclick = () => showMovieDetails(movie.id);
@@ -70,9 +80,8 @@
 
         const card = document.createElement('div');
         card.className = 'movie-card';
-        card.style = "background:#1a1a1a;padding:10px;width:160px;border-radius:10px;cursor:pointer;";
         card.innerHTML = `
-          <img src="${poster}" alt="${movie.title}" style="width:100%;border-radius:10px;" />
+          <img src="${poster}" alt="${movie.title}" />
           <p>${movie.title}</p>
         `;
         card.onclick = () => showMovieDetails(movie.id);
@@ -80,42 +89,75 @@
       });
     }
 
+    async function getOTTInfo(movieId) {
+      const region = 'IN'; // You can change this if needed
+      const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/watch/providers?api_key=${tmdbApiKey}`);
+      const data = await res.json();
+      const providers = data.results[region];
+
+      if (providers && providers.flatrate) {
+        return providers.flatrate.map(p => ({
+          name: p.provider_name,
+          logo: `https://image.tmdb.org/t/p/w45${p.logo_path}`,
+          link: providerLinkMap[p.provider_name] || providers.link
+        }));
+      } else {
+        return [];
+      }
+    }
+
     async function showMovieDetails(movieId) {
       const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${tmdbApiKey}&language=en-US`);
       const movie = await response.json();
+      const ottPlatforms = await getOTTInfo(movieId);
 
       const poster = movie.poster_path
         ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
         : 'https://via.placeholder.com/300x450?text=No+Image';
 
-      // Clear full page content
+      let ottHTML = '';
+      if (ottPlatforms.length > 0) {
+        ottHTML += `<div class="ott-platforms"><h3>Available On</h3>`;
+        ottPlatforms.forEach(p => {
+          ottHTML += `
+            <div class="ott-platform">
+              <img src="${p.logo}" alt="${p.name}" />
+              <a href="${p.link}" target="_blank">${p.name}</a>
+            </div>
+          `;
+        });
+        ottHTML += `</div>`;
+      } else {
+        ottHTML = `<p style="font-style: italic;">Not available on OTT in your region.</p>`;
+      }
+
       document.body.innerHTML = `
-        <div class="movie-details">
+        <div class="movie-detail-card">
           <img src="${poster}" alt="${movie.title}">
           <h2>${movie.title} (${movie.release_date.split('-')[0]})</h2>
           <p><strong>⭐ Rating:</strong> ${movie.vote_average}</p>
           <p><strong>Genres:</strong> ${movie.genres.map(g => g.name).join(', ')}</p>
           <p><strong>Overview:</strong> ${movie.overview}</p>
+          ${ottHTML}
           <button class="back-btn" onclick="window.location.reload()">🔙 Back to Home</button>
         </div>
       `;
     }
 
-    // Load top rated on page load
+    // Load top rated movies on page load
     loadTopRatedMovies();
   </script>
 
-</body>
-<footer>
-  <div class="footer-content">
+  <footer>
     <p>&copy; 2025 MoviePlix. All rights reserved.</p>
     <div class="footer-links">
-      <a href="#">About Us</a>
-      <a href="#">Help</a>
-      <a href="#">Contact</a>
-      <a href="#">Terms</a>
+      <a href="#">About Us</a> |
+      <a href="#">Help</a> |
+      <a href="#">Contact</a> |
+      <a href="#">Terms</a> |
       <a href="#">Privacy</a>
     </div>
-  </div>
-</footer>
+  </footer>
+
+</body>
 </html>
