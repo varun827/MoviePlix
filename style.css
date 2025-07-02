@@ -19,6 +19,14 @@ header h1 {
   font-size: 2rem;
 }
 
+.site-logo {
+  height: 100px;
+  width: auto;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
+}
+
 .search-container {
   margin: 30px 0;
   display: flex;
@@ -144,6 +152,16 @@ footer {
   color: #888;
 }
 
+.footer-links a {
+  color: #888;
+  margin: 0 10px;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 768px) {
   .details-container {
     flex-direction: column;
@@ -160,13 +178,7 @@ footer {
     text-align: center;
   }
 }
-.site-logo {
-  height: 100px;  
-  width: auto;
-  object-fit: contain;
-  margin: 0 auto;
-  display: block;
-}
+
 .movie-detail-card {
   background-color: #1a1a1a;
   border-radius: 20px;
@@ -182,7 +194,7 @@ footer {
   width: 250px;
   border-radius: 10px;
   margin-bottom: 20px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
 .movie-detail-card h2 {
@@ -203,4 +215,32 @@ footer {
 
 .movie-detail-card .emoji {
   margin-right: 6px;
+}
+
+/* OTT Platform Styles */
+.ott-platforms {
+  margin-top: 20px;
+}
+
+.ott-platform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.ott-platform img {
+  width: 30px;
+  height: auto;
+}
+
+.ott-platform a {
+  color: #1e90ff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.ott-platform a:hover {
+  text-decoration: underline;
 }
